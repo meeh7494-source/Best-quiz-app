@@ -1,0 +1,78 @@
+import streamlit as st
+
+st.set_page_config(page_title="Quiz App", page_icon="🧠", layout="centered")
+
+questions = [
+    {
+        "question": "India ki rajdhani kya hai?",
+        "options": ["Mumbai", "Delhi", "Kolkata", "Chennai"],
+        "answer": "Delhi"
+    },
+    {
+        "question": "2 + 2 kitna hota hai?",
+        "options": ["3", "4", "5", "6"],
+        "answer": "4"
+    },
+    {
+        "question": "Python kya hai?",
+        "options": ["Snake", "Programming Language", "Game", "Browser"],
+        "answer": "Programming Language"
+    }
+]
+
+if "current_q" not in st.session_state:
+    st.session_state.current_q = 0
+if "score" not in st.session_state:
+    st.session_state.score = 0
+if "answered" not in st.session_state:
+    st.session_state.answered = False
+if "selected_option" not in st.session_state:
+    st.session_state.selected_option = None
+
+st.title("🧠 Quiz Web App")
+st.write("Welcome! Quiz complete karo aur score dekho.")
+
+if st.session_state.current_q < len(questions):
+    q = questions[st.session_state.current_q]
+
+    st.subheader(f"Question {st.session_state.current_q + 1} / {len(questions)}")
+    st.write(q["question"])
+
+    selected = st.radio(
+        "Choose your answer:",
+        q["options"],
+        key=f"q_{st.session_state.current_q}"
+    )
+
+    if not st.session_state.answered:
+        if st.button("Submit Answer"):
+            st.session_state.selected_option = selected
+            st.session_state.answered = True
+
+            if selected == q["answer"]:
+                st.session_state.score += 1
+                st.success("✅ Correct!")
+            else:
+                st.error(f"❌ Wrong! Correct answer: {q['answer']}")
+    else:
+        if st.session_state.selected_option == q["answer"]:
+            st.success("✅ Correct!")
+        else:
+            st.error(f"❌ Wrong! Correct answer: {q['answer']}")
+
+        if st.button("Next Question"):
+            st.session_state.current_q += 1
+            st.session_state.answered = False
+            st.session_state.selected_option = None
+            st.rerun()
+
+else:
+    st.balloons()
+    st.success(f"🎉 Quiz Finished! Score: {st.session_state.score}/{len(questions)}")
+
+    if st.button("Restart Quiz"):
+        st.session_state.current_q = 0
+        st.session_state.score = 0
+        st.session_state.answered = False
+        st.session_state.selected_option = None
+        st.rerun()
